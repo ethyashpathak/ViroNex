@@ -1,3 +1,5 @@
+//feel free to use it anywhere in your code
+
 // Think of it as an "error manager" that gives more info than normal Error
 class ApiError extends Error {
     constructor(

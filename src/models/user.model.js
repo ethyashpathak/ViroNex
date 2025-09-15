@@ -62,6 +62,20 @@ userSchema.pre("save",async function(next){
 userSchema.methods.isPasswordCorrect=async function(password){
     return await bcrypt.compare(password,this.password)
 }
+/*
+  Access & Refresh Tokens (JWT):
+
+  - generateAccessToken(): issues a short-lived JWT containing user info 
+    (id, email, username, fullName). Used to authenticate API requests.
+
+  - generateRefreshToken(): issues a long-lived JWT containing only user id.
+    Used to silently obtain new access tokens after the old one expires.
+
+  Real-world effect:
+    Apps with refresh tokens keep users logged in by refreshing access tokens.
+    Apps without refresh tokens force users to log in again once the token expires.
+*/
+
 
 userSchema.methods.generateAccessToken=function(){
     return jwt.sign(
