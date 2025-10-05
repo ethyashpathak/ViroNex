@@ -410,6 +410,50 @@ const getUserChannelProfile=asynchandler(async(req,res)=>{
 
 
 })
+const getUserHistory=asynchandler(async(req,res)=>{
+   const user=await User.aggregate([
+    {
+      $match:{
+        _id:new mongoose.Types.ObjectId(req.user)
+      }
+    },
+    {
+      $lookup:{
+        from:"videos",
+        localfield:"watchHistory",
+        foreignField:"_id",
+        as:"watchHistory",
+        pipeline:[
+          {
+            $project:{
+              fullName:1,
+              username:1,
+              avatar:1
+            }
+          }
+        ]
+      }
+    },
+    {
+      $addFields:{
+        owner:{
+          $first:"$owner"
+        }
+      }
+    }
+   ])
+   
+   return res
+   .status(200)
+   .json(
+    new ApiResponse(
+      200,
+      user[0].watchHistory,
+      "Watch History fetched successfully"
+    )
+   )
+})
+
 
 
 export { registerUser 
@@ -421,7 +465,9 @@ export { registerUser
   ,generateAccessTokenandRefreshToken
   ,updateAccountDetails
   ,updateUserAvatar
-  ,updateUserCoverImage};
+  ,updateUserCoverImage
+  ,getUserChannelProfile
+  ,getUserHistory};
 
 //the full explaination to the aggregation pipelines used in the getUserChannelProfile part.....
   /**
