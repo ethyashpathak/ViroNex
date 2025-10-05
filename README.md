@@ -1,208 +1,310 @@
-# ViroNex 🚀
+# ViroNex Backend API Documentation
 
-A full-stack social media platform inspired by YouTube and Twitter, built with modern web technologies. Share videos, connect with friends, and engage with content in real-time.
+---
 
-![ViroNex](https://img.shields.io/badge/ViroNex-Social%20Media-blue?style=for-the-badge&logo=video&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
-![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
-
-## 🌟 Features
-
-### 🔐 Authentication & User Management
-- Secure user registration and login
-- JWT-based authentication
-- Password hashing with bcrypt
-- Profile management with avatars and cover images
-
-### 📹 Video Content
-- Upload and stream videos
-- Cloud storage with Cloudinary
-- Video metadata management
-- Content categorization and tagging
-
-### 💬 Social Interactions
-- Like and comment on videos
-- Follow/unfollow users
-- Real-time notifications
-- User engagement analytics
-
-### 🔍 Discovery & Search
-- Advanced video search
-- Trending content algorithms
-- Personalized recommendations
-- Hashtag-based content discovery
-
-### 📱 API-First Architecture
-- RESTful API design
-- Comprehensive error handling
-- Rate limiting and security
-- CORS-enabled for frontend integration
-
-## 🛠️ Tech Stack
-
-### Backend
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB with Mongoose
-- **Authentication**: JWT (JSON Web Tokens)
-- **File Storage**: Cloudinary
-- **Password Hashing**: bcrypt
-- **File Uploads**: Multer
-
-### DevOps & Tools
-- **Process Management**: Nodemon
-- **Environment**: dotenv
-- **Version Control**: Git
-- **Package Manager**: npm
-
-## 📁 Project Structure
+## 🔗 Base Configuration
 
 ```
-ViroNex/
-├── src/
-│   ├── app.js                 # Express app configuration
-│   ├── index.js              # Server entry point
-│   ├── constants.js          # Application constants
-│   ├── controllers/
-│   │   └── user.controller.js # User-related business logic
-│   ├── db/
-│   │   └── index.js          # Database connection
-│   ├── middlewares/
-│   │   └── multer.middleware.js # File upload middleware
-│   ├── models/
-│   │   ├── user.model.js     # User data schema
-│   │   └── video.model.js    # Video data schema
-│   ├── routes/
-│   │   └── user.routes.js    # User API routes
-│   └── utils/
-│       ├── ApiError.js       # Custom error handling
-│       ├── ApiResponse.js    # Standardized API responses
-│       ├── asynchandler.js   # Async error wrapper
-│       └── cloudinary.js     # Cloud storage utility
-├── public/
-│   └── temp/                 # Temporary file storage
-├── package.json              # Dependencies and scripts
-├── .env                      # Environment variables
-└── README.md                # Project documentation
+Base URL: http://localhost:8000/api/v1
+Environment: Development
+Content-Type: application/json (default)
+Content-Type: multipart/form-data (file uploads)
 ```
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
+## 🔐 Authentication
 
-Before running this application, make sure you have:
-- Node.js (v18 or higher)
-- MongoDB (local or Atlas)
-- Cloudinary account for media storage
+**Type**: JWT (JSON Web Tokens)
+**Header**: `Authorization: Bearer <access_token>`
+**Storage**: Store both access token and refresh token
+**Refresh**: Use `/refresh-token` when access token expires
 
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/ethyashpathak/ViroNex.git
-   cd ViroNex
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Environment Setup**
-   Create a `.env` file in the root directory:
-   ```env
-   PORT=8000
-   MONGODB_URI=mongodb://localhost:27017/vironex
-   CORS_ORIGIN=http://localhost:3000
-   CLOUDINARY_CLOUD_NAME=your_cloud_name
-   CLOUDINARY_API_KEY=your_api_key
-   CLOUDINARY_API_SECRET=your_api_secret
-   JWT_SECRET=your_jwt_secret
-   ```
-
-4. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-The server will start on `http://localhost:8000`
+---
 
 ## 📡 API Endpoints
 
 ### Authentication Routes
 ```
-POST /api/v1/users/register  # Register new user
-POST /api/v1/users/login     # User login
+POST   /users/register          # User registration with avatar upload
+POST   /users/login             # User login
+POST   /users/logout            # User logout (requires auth)
+POST   /users/refresh-token     # Refresh access token
 ```
 
-### User Management
+### User Management Routes  
 ```
-GET    /api/v1/users/profile      # Get user profile
-PUT    /api/v1/users/profile      # Update user profile
-DELETE /api/v1/users/profile      # Delete user account
+GET    /users/current-user      # Get current user info (requires auth)
+PATCH  /users/update-details    # Update user details (requires auth)
+POST   /users/change-password   # Change password (requires auth)
+PATCH  /users/change-avatar     # Update avatar (requires auth + file)
+PATCH  /users/change-cover-image # Update cover image (requires auth + file)
+GET    /users/channel/:username # Get user channel profile (requires auth)
+GET    /users/watch-history     # Get user watch history (requires auth)
 ```
-
-### Video Management
-```
-POST   /api/v1/videos/upload      # Upload new video
-GET    /api/v1/videos             # Get all videos
-GET    /api/v1/videos/:id         # Get specific video
-PUT    /api/v1/videos/:id         # Update video
-DELETE /api/v1/videos/:id         # Delete video
-```
-
-### Social Features
-```
-POST   /api/v1/videos/:id/like     # Like/unlike video
-POST   /api/v1/videos/:id/comment  # Add comment
-GET    /api/v1/users/:id/follow    # Follow user
-```
-
-## 🔧 Development
-
-### Available Scripts
-
-- `npm run dev` - Start development server with hot reload
-- `npm start` - Start production server
-- `npm test` - Run tests (when implemented)
-
-### Code Quality
-
-- **Error Handling**: Custom ApiError class for consistent error responses
-- **Async Wrapper**: AsyncHandler utility for clean async code
-- **Validation**: Input validation and sanitization
-- **Security**: CORS, rate limiting, and secure headers
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Author
-
-**Shaswat Pathak**
-- GitHub: [@ethyashpathak](https://github.com/ethyashpathak)
-
-## 🙏 Acknowledgments
-
-- Inspired by YouTube and Twitter
-- Built with modern JavaScript and Node.js best practices
-- Thanks to the open-source community for amazing tools and libraries
 
 ---
 
-⭐ **Star this repo if you found it helpful!**
+## 📝 Request/Response Examples
 
-Made with ❤️ by Shaswat Pathak</content>
-<parameter name="filePath">d:\2nd year\ViroNex\README.md
+### 1. User Registration
+**Endpoint**: `POST /users/register`
+**Content-Type**: `multipart/form-data`
+
+**Request Body**:
+```javascript
+{
+  fullName: "John Doe",           // required
+  email: "john@example.com",      // required  
+  username: "johndoe",            // required
+  password: "securePassword123",  // required
+  avatar: File,                   // required (image file)
+  coverImage: File                // optional (image file)
+}
+```
+
+**Success Response** (201):
+```javascript
+{
+  statusCode: 200,
+  data: {
+    _id: "60f7b3b3b3b3b3b3b3b3b3b3",
+    fullName: "John Doe",
+    username: "johndoe", 
+    email: "john@example.com",
+    avatar: "https://cloudinary.com/image/upload/v1234567890/avatar.jpg",
+    coverImage: "https://cloudinary.com/image/upload/v1234567890/cover.jpg"
+  },
+  message: "User registered Successfully",
+  success: true
+}
+```
+
+### 2. User Login
+**Endpoint**: `POST /users/login`
+**Content-Type**: `application/json`
+
+**Request Body**:
+```javascript
+{
+  username: "johndoe",            // or email
+  password: "securePassword123"
+}
+```
+
+**Success Response** (200):
+```javascript
+{
+  statusCode: 200,
+  data: {
+    user: {
+      _id: "60f7b3b3b3b3b3b3b3b3b3b3",
+      fullName: "John Doe",
+      username: "johndoe",
+      email: "john@example.com", 
+      avatar: "https://cloudinary.com/...",
+      coverImage: "https://cloudinary.com/..."
+    },
+    accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  },
+  message: "User logged in successfully",
+  success: true
+}
+```
+
+### 3. Get Current User
+**Endpoint**: `GET /users/current-user`
+**Headers**: `Authorization: Bearer <access_token>`
+
+**Success Response** (200):
+```javascript
+{
+  statusCode: 200,
+  data: {
+    _id: "60f7b3b3b3b3b3b3b3b3b3b3",
+    fullName: "John Doe",
+    username: "johndoe",
+    email: "john@example.com",
+    avatar: "https://cloudinary.com/...",
+    coverImage: "https://cloudinary.com/..."
+  },
+  message: "Current user retrieved successfully",
+  success: true
+}
+```
+
+### 4. Update User Details
+**Endpoint**: `PATCH /users/update-details`
+**Headers**: `Authorization: Bearer <access_token>`
+**Content-Type**: `application/json`
+
+**Request Body**:
+```javascript
+{
+  fullName: "John Smith",        // optional
+  email: "johnsmith@example.com" // optional
+}
+```
+
+### 5. Change Avatar
+**Endpoint**: `PATCH /users/change-avatar`
+**Headers**: `Authorization: Bearer <access_token>`
+**Content-Type**: `multipart/form-data`
+
+**Request Body**:
+```javascript
+{
+  avatar: File  // required (image file)
+}
+```
+
+### 6. Refresh Token
+**Endpoint**: `POST /users/refresh-token`
+**Content-Type**: `application/json`
+
+**Request Body**:
+```javascript
+{
+  refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+---
+
+## ⚠️ Error Responses
+
+**Standard Error Format**:
+```javascript
+{
+  statusCode: 400,
+  message: "Validation error message",
+  success: false,
+  errors: ["Specific error 1", "Specific error 2"]
+}
+```
+
+**Common Status Codes**:
+- `400` - Bad Request (validation errors, missing fields)
+- `401` - Unauthorized (invalid/missing token)
+- `404` - Not Found (user/resource doesn't exist)
+- `409` - Conflict (user already exists)
+- `500` - Internal Server Error
+
+**Example Error Responses**:
+
+*Validation Error (400)*:
+```javascript
+{
+  statusCode: 400,
+  message: "All fields are required",
+  success: false,
+  errors: []
+}
+```
+
+*Authentication Error (401)*:
+```javascript
+{
+  statusCode: 401,
+  message: "Unauthorized request",
+  success: false,
+  errors: []
+}
+```
+
+*User Already Exists (409)*:
+```javascript
+{
+  statusCode: 409,
+  message: "User with email or username already exists",
+  success: false,
+  errors: []
+}
+```
+
+---
+
+## 📁 File Upload Specifications
+
+### Avatar Upload
+- **Field name**: `avatar`
+- **Type**: Single file
+- **Formats**: Image files (jpg, png, etc.)
+- **Storage**: Cloudinary
+- **Required**: Yes (for registration)
+
+### Cover Image Upload  
+- **Field name**: `coverImage`
+- **Type**: Single file
+- **Formats**: Image files (jpg, png, etc.)
+- **Storage**: Cloudinary
+- **Required**: No
+
+---
+
+## 🔧 Frontend Implementation Checklist
+
+### Authentication Flow
+- [ ] Registration form with file upload
+- [ ] Login form
+- [ ] Logout functionality
+- [ ] Token storage (localStorage/sessionStorage)
+- [ ] Automatic token refresh
+- [ ] Protected route component
+- [ ] Authentication context/state management
+
+### API Integration
+- [ ] HTTP client setup (axios/fetch)
+- [ ] Request interceptors (add auth headers)
+- [ ] Response interceptors (handle errors)
+- [ ] Error handling component
+- [ ] Loading states for API calls
+
+### File Upload Components
+- [ ] Avatar upload with preview
+- [ ] Cover image upload with preview
+- [ ] File validation (type, size)
+- [ ] Upload progress indicators
+
+### User Interface Components
+- [ ] Registration form
+- [ ] Login form
+- [ ] User profile display
+- [ ] Edit profile form
+- [ ] Change password form
+- [ ] Error message display
+- [ ] Success message display
+
+---
+
+## 🌐 CORS Configuration
+
+**Allowed Origins**: Configurable via `CORS_ORIGIN` environment variable
+**Credentials**: Enabled (cookies and auth headers allowed)
+**Methods**: GET, POST, PATCH, DELETE, OPTIONS
+**Headers**: Content-Type, Authorization
+
+---
+
+## 🚀 Development Tips
+
+1. **Token Management**: Store tokens securely and implement automatic refresh
+2. **Error Handling**: Create a centralized error handler for consistent UX
+3. **Loading States**: Show spinners/loaders during API calls
+4. **Form Validation**: Validate on frontend before sending to backend
+5. **File Upload**: Implement file preview and validation
+6. **Responsive Design**: Ensure forms work on all device sizes
+7. **Security**: Never store sensitive data in localStorage in production
+
+---
+
+## 📞 Contact Information
+
+**Backend Developer**: Shaswat Pathak
+**Repository**: https://github.com/ethyashpathak/ViroNex
+**Issues**: Report bugs via GitHub issues
+
+---
+
+*Last Updated: October 2025*
