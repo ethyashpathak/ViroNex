@@ -5,7 +5,7 @@
 ## 🔗 Base Configuration
 
 ```
-Base URL: http://localhost:8000/api/v1
+Base URL:https://vironex.onrender.com
 Environment: Development
 Content-Type: application/json (default)
 Content-Type: multipart/form-data (file uploads)
