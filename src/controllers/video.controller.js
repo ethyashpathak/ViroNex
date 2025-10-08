@@ -10,12 +10,12 @@ import {uploadOnCloudinary,deleteFromCloudinary} from "../utils/cloudinary.js"
 const getAllVideos = asynchandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
     
-    // Build the match conditions
+   
     const matchConditions = {
-        isPublished: true // Only show published videos
+        isPublished: true 
     };
     
-    // Add search query if provided (search in title and description)
+    
     if (query) {
         matchConditions.$or = [
             { title: { $regex: query, $options: "i" } },
@@ -23,7 +23,7 @@ const getAllVideos = asynchandler(async (req, res) => {
         ];
     }
     
-    // Filter by userId if provided
+    
     if (userId) {
         if (!isValidObjectId(userId)) {
             throw new ApiError(400, "Invalid user ID");
@@ -31,16 +31,16 @@ const getAllVideos = asynchandler(async (req, res) => {
         matchConditions.owner = new mongoose.Types.ObjectId(userId);
     }
     
-    // Build sort options
+   
     const sortOptions = {};
     if (sortBy && sortType) {
         sortOptions[sortBy] = sortType === "asc" ? 1 : -1;
     } else {
-        // Default sort by createdAt descending (newest first)
+        
         sortOptions.createdAt = -1;
     }
     
-    // Convert page and limit to numbers
+    
     const pageNumber = parseInt(page);
     const limitNumber = parseInt(limit);
     const skip = (pageNumber - 1) * limitNumber;
