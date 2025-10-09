@@ -7,6 +7,7 @@ import {asynchandler} from "../utils/asynchandler.js"
 import {uploadOnCloudinary,deleteFromCloudinary} from "../utils/cloudinary.js"
 
 
+
 const getAllVideos = asynchandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
     
@@ -145,6 +146,7 @@ const publishAVideo = asynchandler(async (req, res) => {
     videoFile: video.url,
     thumbnail:thumb.url,
     duration:video.duration,
+    
     owner:req.userId
   });
 
@@ -153,7 +155,7 @@ const publishAVideo = asynchandler(async (req, res) => {
   }
    return res
     .status(201)
-    .json(new ApiResponse(200, uploadedVdo, "Video uploaded Succesfully"));   
+    .json(new ApiResponse(200, vdo, "Video uploaded Succesfully"));   
 
 })
 
