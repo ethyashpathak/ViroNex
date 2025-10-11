@@ -26,8 +26,100 @@ const createTweet = asynchandler(async (req, res) => {
 
 const getUserTweets = asynchandler(async (req, res) => {
     // TODO: get user tweets
-
-})
+    const { userId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+    
+    // Validate userId
+    if (!isValidObjectId(userId)) {
+        throw new ApiError(400, "Invalid user ID");
+    }
+    
+    // Check if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+    
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+    const skip = (pageNumber - 1) * limitNumber;
+    
+    // Aggregation pipeline to get user tweets with owner details
+    const tweets = await Tweet.aggregate([
+        {
+            $match: {
+                owner: new mongoose.Types.ObjectId(userId)
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "ownerDetails",
+                pipeline: [
+                    {
+                        $project: {
+                            username: 1,
+                            fullName: 1,
+                            avatar: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $unwind: "$ownerDetails"
+        },
+        {
+            $sort: {
+                createdAt: -1 // Newest tweets first
+            }
+        },
+        {
+            $skip: skip
+        },
+        {
+            $limit: limitNumber
+        },
+        {
+            $project: {
+                _id: 1,
+                content: 1,
+                owner: 1,
+                ownerDetails: 1,
+                createdAt: 1,
+                updatedAt: 1
+            }
+        }
+    ]);
+    
+    // Get total count for pagination
+    const totalTweets = await Tweet.countDocuments({ owner: userId });
+    const totalPages = Math.ceil(totalTweets / limitNumber);
+    const hasNextPage = pageNumber < totalPages;
+    const hasPrevPage = pageNumber > 1;
+    
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    tweets,
+                    pagination: {
+                        currentPage: pageNumber,
+                        totalPages,
+                        totalTweets,
+                        limit: limitNumber,
+                        hasNextPage,
+                        hasPrevPage
+                    }
+                },
+                "User tweets fetched successfully"
+            )
+        );
+});
 
 const updateTweet = asynchandler(async (req, res) => {
     //TODO: update tweet
