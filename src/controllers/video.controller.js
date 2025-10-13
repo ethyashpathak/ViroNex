@@ -46,7 +46,7 @@ const getAllVideos = asynchandler(async (req, res) => {
     const limitNumber = parseInt(limit);
     const skip = (pageNumber - 1) * limitNumber;
     
-    // Aggregation pipeline
+    
     const videos = await Video.aggregate([
         {
             $match: matchConditions
