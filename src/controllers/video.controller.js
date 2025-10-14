@@ -127,7 +127,8 @@ const getAllVideos = asynchandler(async (req, res) => {
 });
 
 const publishAVideo = asynchandler(async (req, res) => {
-    const { title, description,videoFile,thumbnail} = req.body;
+    const { title, description} = req.body;
+    const {videoFile,thumbnail}=req.files;
     if (
     [title,description].some(
       (field) => field?.trim() === ""
