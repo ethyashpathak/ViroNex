@@ -26,21 +26,84 @@ Content-Type: multipart/form-data (file uploads)
 
 ### Authentication Routes
 ```
-POST   /users/register          # User registration with avatar upload
-POST   /users/login             # User login
-POST   /users/logout            # User logout (requires auth)
-POST   /users/refresh-token     # Refresh access token
+POST   /api/v1/users/register          # User registration with avatar upload
+POST   /api/v1/users/login             # User login
+POST   /api/v1/users/logout            # User logout (requires auth)
+POST   /api/v1/users/refresh-token     # Refresh access token
 ```
 
 ### User Management Routes  
 ```
-GET    /users/current-user      # Get current user info (requires auth)
-PATCH  /users/update-details    # Update user details (requires auth)
-POST   /users/change-password   # Change password (requires auth)
-PATCH  /users/change-avatar     # Update avatar (requires auth + file)
-PATCH  /users/change-cover-image # Update cover image (requires auth + file)
-GET    /users/channel/:username # Get user channel profile (requires auth)
-GET    /users/watch-history     # Get user watch history (requires auth)
+GET    /api/v1/users/current-user           # Get current user info (requires auth)
+PATCH  /api/v1/users/update-details         # Update user details (requires auth)
+POST   /api/v1/users/change-password        # Change password (requires auth)
+PATCH  /api/v1/users/change-avatar          # Update avatar (requires auth + file)
+PATCH  /api/v1/users/change-cover-image     # Update cover image (requires auth + file)
+GET    /api/v1/users/channel/:username      # Get user channel profile (requires auth)
+GET    /api/v1/users/watch-history          # Get user watch history (requires auth)
+```
+
+### Video Routes
+```
+GET    /api/v1/videos                   # Get all videos with filters (requires auth)
+POST   /api/v1/videos                   # Upload/publish a video (requires auth + files)
+GET    /api/v1/videos/:videoId          # Get video by ID (requires auth)
+PATCH  /api/v1/videos/:videoId          # Update video details (requires auth + file)
+DELETE /api/v1/videos/:videoId          # Delete video (requires auth)
+PATCH  /api/v1/videos/toggle/publish/:videoId  # Toggle publish status (requires auth)
+```
+
+### Tweet Routes
+```
+POST   /api/v1/tweets                   # Create a tweet (requires auth)
+GET    /api/v1/tweets/user/:userId      # Get user tweets (requires auth)
+PATCH  /api/v1/tweets/:tweetId          # Update tweet (requires auth)
+DELETE /api/v1/tweets/:tweetId          # Delete tweet (requires auth)
+```
+
+### Comment Routes
+```
+POST   /api/v1/comments/:videoId        # Add comment to video (requires auth)
+GET    /api/v1/comments/:videoId        # Get video comments (requires auth)
+PATCH  /api/v1/comments/:commentId      # Update comment (requires auth)
+DELETE /api/v1/comments/:commentId      # Delete comment (requires auth)
+```
+
+### Playlist Routes
+```
+POST   /api/v1/playlists                      # Create playlist (requires auth)
+GET    /api/v1/playlists/:playlistId          # Get playlist by ID (requires auth)
+PATCH  /api/v1/playlists/:playlistId          # Update playlist (requires auth)
+DELETE /api/v1/playlists/:playlistId          # Delete playlist (requires auth)
+PATCH  /api/v1/playlists/add/:videoId/:playlistId     # Add video to playlist (requires auth)
+PATCH  /api/v1/playlists/remove/:videoId/:playlistId  # Remove video from playlist (requires auth)
+GET    /api/v1/playlists/user/:userId         # Get user playlists (requires auth)
+```
+
+### Like Routes
+```
+POST   /api/v1/likes/toggle/v/:videoId     # Toggle like on video (requires auth)
+POST   /api/v1/likes/toggle/c/:commentId   # Toggle like on comment (requires auth)
+POST   /api/v1/likes/toggle/t/:tweetId     # Toggle like on tweet (requires auth)
+GET    /api/v1/likes/videos                 # Get liked videos (requires auth)
+```
+
+### Subscription Routes
+```
+POST   /api/v1/subscriptions/c/:channelId              # Toggle subscription (requires auth)
+GET    /api/v1/subscriptions/c/:channelId/subscribers  # Get channel subscribers (requires auth)
+GET    /api/v1/subscriptions/u/:subscriberId           # Get subscribed channels (requires auth)
+```
+
+### Dashboard Routes
+```
+GET    /api/v1/dashboard/stats/:channelId   # Get channel statistics (requires auth)
+GET    /api/v1/dashboard/videos/:channelId  # Get channel videos (requires auth)
+```
+
+### Health Check
+```
+GET    /api/v1/healthcheck                  # Check API health status
 ```
 
 ---
@@ -168,6 +231,196 @@ GET    /users/watch-history     # Get user watch history (requires auth)
 {
   refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
+```
+
+---
+
+## 📋 Detailed Endpoint Examples
+
+### Video Endpoints
+
+#### Get All Videos
+```
+GET /api/v1/videos?page=1&limit=10&query=javascript&sortBy=views&sortType=desc
+```
+**Query Parameters:**
+- `page` (optional): Page number
+- `limit` (optional): Videos per page
+- `query` (optional): Search in title/description
+- `sortBy` (optional): Field to sort by (views, createdAt, etc.)
+- `sortType` (optional): asc or desc
+- `userId` (optional): Filter by user
+
+#### Upload Video
+```
+POST /api/v1/videos
+Content-Type: multipart/form-data
+
+Fields:
+- title: "Video Title"
+- description: "Video Description"
+- videoFile: [video file]
+- thumbnail: [image file]
+```
+
+#### Update Video
+```
+PATCH /api/v1/videos/:videoId
+Content-Type: multipart/form-data
+
+Fields:
+- title: "Updated Title" (optional)
+- description: "Updated Description" (optional)
+- thumbnail: [new image file] (optional)
+```
+
+---
+
+### Tweet Endpoints
+
+#### Create Tweet
+```
+POST /api/v1/tweets
+Content-Type: application/json
+
+Body:
+{
+  "content": "This is my tweet! 🚀"
+}
+```
+
+#### Get User Tweets
+```
+GET /api/v1/tweets/user/:userId?page=1&limit=10
+```
+
+#### Update Tweet
+```
+PATCH /api/v1/tweets/:tweetId
+Content-Type: application/json
+
+Body:
+{
+  "content": "Updated tweet content"
+}
+```
+
+---
+
+### Comment Endpoints
+
+#### Add Comment
+```
+POST /api/v1/comments/:videoId
+Content-Type: application/json
+
+Body:
+{
+  "content": "Great video!"
+}
+```
+
+#### Get Video Comments
+```
+GET /api/v1/comments/:videoId?page=1&limit=10
+```
+
+#### Update Comment
+```
+PATCH /api/v1/comments/:commentId
+Content-Type: application/json
+
+Body:
+{
+  "content": "Updated comment"
+}
+```
+
+---
+
+### Playlist Endpoints
+
+#### Create Playlist
+```
+POST /api/v1/playlists
+Content-Type: application/json
+
+Body:
+{
+  "name": "My Favorites",
+  "description": "Collection of favorite videos"
+}
+```
+
+#### Add Video to Playlist
+```
+PATCH /api/v1/playlists/add/:videoId/:playlistId
+```
+
+#### Get User Playlists
+```
+GET /api/v1/playlists/user/:userId?page=1&limit=10
+```
+
+---
+
+### Like Endpoints
+
+#### Toggle Video Like
+```
+POST /api/v1/likes/toggle/v/:videoId
+```
+
+#### Toggle Comment Like
+```
+POST /api/v1/likes/toggle/c/:commentId
+```
+
+#### Get Liked Videos
+```
+GET /api/v1/likes/videos?page=1&limit=10
+```
+
+---
+
+### Subscription Endpoints
+
+#### Subscribe/Unsubscribe
+```
+POST /api/v1/subscriptions/c/:channelId
+```
+
+#### Get Channel Subscribers
+```
+GET /api/v1/subscriptions/c/:channelId/subscribers?page=1&limit=10
+```
+
+#### Get Subscribed Channels
+```
+GET /api/v1/subscriptions/u/:subscriberId?page=1&limit=10
+```
+
+---
+
+### Dashboard Endpoints
+
+#### Get Channel Stats
+```
+GET /api/v1/dashboard/stats/:channelId
+
+Response:
+{
+  "totalSubscribers": 1250,
+  "totalVideos": 45,
+  "totalViews": 125000,
+  "totalLikes": 8500,
+  "totalComments": 3200
+}
+```
+
+#### Get Channel Videos
+```
+GET /api/v1/dashboard/videos/:channelId?page=1&limit=10&sortBy=views&sortType=desc
 ```
 
 ---
