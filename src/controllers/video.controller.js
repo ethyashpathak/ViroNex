@@ -145,8 +145,7 @@ const publishAVideo = asynchandler(async (req, res) => {
     description,
     videoFile: video.url,
     thumbnail:thumb.url,
-    duration:video.duration,
-    
+    duration:video.duration,   
     owner:req.userId
   });
 
@@ -156,7 +155,6 @@ const publishAVideo = asynchandler(async (req, res) => {
    return res
     .status(201)
     .json(new ApiResponse(200, vdo, "Video uploaded Succesfully"));   
-
 })
 
 const getVideoById = asynchandler(async (req, res) => {
