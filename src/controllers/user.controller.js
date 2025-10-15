@@ -60,7 +60,7 @@ const registerUser = asynchandler(async (req, res) => {
 
   console.log(req.files);
 
-  const avatarLocalPath = req.files?.avatar[0]?.path;
+  const avatarLocalPath = req.files?.avatar?.[0]?.path;
 
   // const coverImageLocalPath = req.files?.coverImage[0]?.path;
   let coverImageLocalPath;
@@ -253,7 +253,7 @@ const changeCurrentPassword=asynchandler(async(req,res)=>{
 const getCurrentUser=asynchandler(async(req,res)=>{
    return res
    .status(200)
-   .json(200,req.user,"current user fetched successfully")
+   .json(new ApiResponse(200, req.user, "Current user fetched successfully"))
 })
 
 const updateAccountDetails=asynchandler(async(req,res)=>{

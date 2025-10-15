@@ -134,26 +134,26 @@ const getUserChannelSubscribers = asynchandler(async (req, res) => {
 });
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asynchandler(async (req, res) => {
-    const { subscriberId } = req.params
+    const { subscriberId } = req.params;
     const { page = 1, limit = 10 } = req.query;
     
-    
+    //Validate subscriberId
     if (!isValidObjectId(subscriberId)) {
-        throw new ApiError(400, "Invalid channel ID");
+        throw new ApiError(400, "Invalid subscriber ID");
     }
     
-    
-    const channel = await User.findById(subscriberId);
-    if (!channel) {
-        throw new ApiError(404, "user not found");
+    // Check if user exists
+    const user = await User.findById(subscriberId);
+    if (!user) {
+        throw new ApiError(404, "User not found");
     }
     
     const pageNumber = parseInt(page);
     const limitNumber = parseInt(limit);
     const skip = (pageNumber - 1) * limitNumber;
     
-    
-        const subscribedChannels = await Subscription.aggregate([
+    // Get subscribed channels with their details
+    const subscribedChannels = await Subscription.aggregate([
         {
             $match: {
                 subscriber: new mongoose.Types.ObjectId(subscriberId)
@@ -213,11 +213,12 @@ const getSubscribedChannels = asynchandler(async (req, res) => {
         }
     ]);
     
-   
+    // Get total count
     const totalSubscribed = await Subscription.countDocuments({ subscriber: subscriberId });
     const totalPages = Math.ceil(totalSubscribed / limitNumber);
     const hasNextPage = pageNumber < totalPages;
     const hasPrevPage = pageNumber > 1;
+    
     return res
         .status(200)
         .json(
