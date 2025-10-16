@@ -71,13 +71,13 @@ DELETE /api/v1/comments/:commentId      # Delete comment (requires auth)
 
 ### Playlist Routes
 ```
-POST   /api/v1/playlists                      # Create playlist (requires auth)
-GET    /api/v1/playlists/:playlistId          # Get playlist by ID (requires auth)
-PATCH  /api/v1/playlists/:playlistId          # Update playlist (requires auth)
-DELETE /api/v1/playlists/:playlistId          # Delete playlist (requires auth)
-PATCH  /api/v1/playlists/add/:videoId/:playlistId     # Add video to playlist (requires auth)
-PATCH  /api/v1/playlists/remove/:videoId/:playlistId  # Remove video from playlist (requires auth)
-GET    /api/v1/playlists/user/:userId         # Get user playlists (requires auth)
+POST   /api/v1/playlist                      # Create playlist (requires auth)
+GET    /api/v1/playlist/:playlistId          # Get playlist by ID (requires auth)
+PATCH  /api/v1/playlist/:playlistId          # Update playlist (requires auth)
+DELETE /api/v1/playlist/:playlistId          # Delete playlist (requires auth)
+PATCH  /api/v1/playlist/add/:videoId/:playlistId     # Add video to playlist (requires auth)
+PATCH  /api/v1/playlist/remove/:videoId/:playlistId  # Remove video from playlist (requires auth)
+GET    /api/v1/playlist/user/:userId         # Get user playlists (requires auth)
 ```
 
 ### Like Routes
@@ -93,12 +93,6 @@ GET    /api/v1/likes/videos                 # Get liked videos (requires auth)
 POST   /api/v1/subscriptions/c/:channelId              # Toggle subscription (requires auth)
 GET    /api/v1/subscriptions/c/:channelId/subscribers  # Get channel subscribers (requires auth)
 GET    /api/v1/subscriptions/u/:subscriberId           # Get subscribed channels (requires auth)
-```
-
-### Dashboard Routes
-```
-GET    /api/v1/dashboard/stats/:channelId   # Get channel statistics (requires auth)
-GET    /api/v1/dashboard/videos/:channelId  # Get channel videos (requires auth)
 ```
 
 ### Health Check
@@ -398,29 +392,6 @@ GET /api/v1/subscriptions/c/:channelId/subscribers?page=1&limit=10
 #### Get Subscribed Channels
 ```
 GET /api/v1/subscriptions/u/:subscriberId?page=1&limit=10
-```
-
----
-
-### Dashboard Endpoints
-
-#### Get Channel Stats
-```
-GET /api/v1/dashboard/stats/:channelId
-
-Response:
-{
-  "totalSubscribers": 1250,
-  "totalVideos": 45,
-  "totalViews": 125000,
-  "totalLikes": 8500,
-  "totalComments": 3200
-}
-```
-
-#### Get Channel Videos
-```
-GET /api/v1/dashboard/videos/:channelId?page=1&limit=10&sortBy=views&sortType=desc
 ```
 
 ---
