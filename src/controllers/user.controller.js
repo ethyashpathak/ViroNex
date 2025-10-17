@@ -174,7 +174,7 @@ const logoutUser=asynchandler(async(req,res)=>{
   const options={
     httOnly:true,
     secure:true,
-    sameSite: "none"
+    SameSite: "none"
   }
 
   return res
