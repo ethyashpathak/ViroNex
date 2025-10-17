@@ -139,7 +139,7 @@ const loginUser = asynchandler(async (req, res) => {
   const loggedinUser=await User.findById(user._id).select("-password -refreshToken");
 
   const options={
-    httOnly:true,
+    httpOnly:true,
     secure:true
   }
 
@@ -173,7 +173,8 @@ const logoutUser=asynchandler(async(req,res)=>{
   )
   const options={
     httOnly:true,
-    secure:true
+    secure:true,
+    sameSite: "none"
   }
 
   return res
@@ -190,7 +191,7 @@ const refreshAccessToken=asynchandler(async(req,res)=>{
   }
 
   try {
-    const decodedToken=jwt.verify(incomingRefreshToken,process.env.ACCESS_TOKEN_SECRET)
+    const decodedToken=jwt.verify(incomingRefreshToken,process.env.REFRESH_TOKEN_SECRET)
   
     const user=await User.findById(decodedToken?._id)
   
