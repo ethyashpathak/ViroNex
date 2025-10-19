@@ -141,7 +141,7 @@ const loginUser = asynchandler(async (req, res) => {
   const options={
     httpOnly:true,
     secure:true,
-    SameSite: "none"
+    SameSite: "None"
   }
 
   return res
@@ -175,7 +175,7 @@ const logoutUser=asynchandler(async(req,res)=>{
   const options={
     httpOnly:true,
     secure:true,
-    SameSite: "none"
+    SameSite: "None"
   }
 
   return res
@@ -206,7 +206,7 @@ const refreshAccessToken=asynchandler(async(req,res)=>{
     const options={
       httpOnly:true,
       secure:true,
-      SameSite: "none"
+      SameSite: "None"
     }
   
     const{accessToken,newrefreshToken}=await generateAccessTokenandRefreshToken(user._id)

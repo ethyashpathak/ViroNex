@@ -5,6 +5,8 @@ import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asynchandler} from "../utils/asynchandler.js"
 import {uploadOnCloudinary,deleteFromCloudinary} from "../utils/cloudinary.js"
+import {Like} from "../models/like.model.js"
+import {Subscription} from "../models/subscription.model.js"
 
 
 
@@ -174,23 +176,51 @@ const publishAVideo = asynchandler(async (req, res) => {
 })
 
 const getVideoById = asynchandler(async (req, res) => {
-    
-    const { videoId } = req.params
+    const { videoId } = req.params;
+    const userId = req.user?._id;
 
-    if(!isValidObjectId(videoId)){
-        throw new ApiError(400,"Invalid video id");
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid video ID");
     }
 
-    const video=await Video.findById(videoId);
+    const video = await Video.findById(videoId).populate("owner", "fullName avatar");
 
-    if(!video){
-        throw new ApiError(404,"Not found");
+    if (!video) {
+        throw new ApiError(404, "Video not found");
     }
+
+    video.views += 1;
+    await video.save({ validateBeforeSave: false });
+
+    const likeCount = await Like.countDocuments({ video: videoId });
+    const isLiked = userId
+        ? !!(await Like.findOne({ video: videoId, likedBy: userId }))
+        : false;
+
+    const subscribersCount = await Subscription.countDocuments({
+        channel: video.owner._id
+    });
+
+    const isSubscribed = userId
+        ? !!(await Subscription.findOne({
+              channel: video.owner._id,
+              subscriber: userId
+          }))
+        : false;
+
+    const videoData = video.toObject();
+
+    videoData.likes = likeCount;
+    videoData.isLiked = isLiked;
+    videoData.isDisliked = false; 
+
+    videoData.owner.subscribersCount = subscribersCount;
+    videoData.owner.isSubscribed = isSubscribed;
 
     return res
-    .status(201)
-    .json(new ApiResponse(200, video, "Video fetched successfully"));
-})
+        .status(200)
+        .json(new ApiResponse(200, videoData, "Video fetched successfully"));
+});
 
 const updateVideo = asynchandler(async (req, res) => {
     const { videoId } = req.params
