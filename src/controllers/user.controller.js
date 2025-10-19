@@ -143,6 +143,7 @@ const loginUser = asynchandler(async (req, res) => {
     secure:true,
     SameSite: "None"
   }
+  console.log("LOGIN SECRET CHECK:", process.env.ACCESS_TOKEN_SECRET);
 
   return res
   .status(200)
