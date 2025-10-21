@@ -188,6 +188,33 @@ const getVideoById = asynchandler(async (req, res) => {
     if (!video) {
         throw new ApiError(404, "Video not found");
     }
+    if (userId) {
+        try {
+            // Find the user and update their watch history
+            await User.findByIdAndUpdate(
+                userId,
+                {
+                    // 1. Remove the videoId if it already exists (to prevent duplicates)
+                    $pull: { watchHistory: videoId },
+                }
+            );
+            await User.findByIdAndUpdate(
+                userId,
+                {
+                    // 2. Add the videoId to the beginning of the array
+                    $push: {
+                        watchHistory: {
+                            $each: [videoId],
+                            $position: 0 // Add to the beginning
+                        }
+                    }
+                }
+            );
+        } catch (historyError) {
+            // Log the error but don't block the video fetch
+            console.error("Error updating watch history:", historyError);
+        }
+    }
 
     video.views += 1;
     await video.save({ validateBeforeSave: false });
