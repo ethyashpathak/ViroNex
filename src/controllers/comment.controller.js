@@ -116,7 +116,7 @@ const addComment = asynchandler(async (req, res) => {
         throw new ApiError(401,"Not a valid id")
     }
 
-    const vdo=Video.findById(videoId)
+    const vdo= await Video.findById(videoId)
 
     if(!vdo){
         throw new ApiError(404,"Video not found")
@@ -131,10 +131,14 @@ const addComment = asynchandler(async (req, res) => {
     if(!comm){
         throw new ApiError(500,"Something went wrong")
     }
+    const newComment = await Comment.findById(comm._id).populate(
+      "owner", 
+      "fullName avatar username"
+    );
 
     return res
     .status(200)
-    .json(new ApiResponse(200,comm,"Comment added sucessfully"))
+    .json(new ApiResponse(200,newComment,"Comment added sucessfully"))
 })
 
 const updateComment = asynchandler(async (req, res) => {
