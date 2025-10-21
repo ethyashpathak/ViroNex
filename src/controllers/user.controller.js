@@ -413,49 +413,141 @@ const getUserChannelProfile=asynchandler(async(req,res)=>{
 
 
 })
-const getUserHistory=asynchandler(async(req,res)=>{
-   const user=await User.aggregate([
-    {
-      $match:{
-        _id:new mongoose.Types.ObjectId(req.user)
-      }
-    },
-    {
-      $lookup:{
-        from:"videos",
-        localfield:"watchHistory",
-        foreignField:"_id",
-        as:"watchHistory",
-        pipeline:[
-          {
-            $project:{
-              fullName:1,
-              username:1,
-              avatar:1
-            }
-          }
-        ]
-      }
-    },
-    {
-      $addFields:{
-        owner:{
-          $first:"$owner"
-        }
-      }
-    }
-   ])
+// const getUserHistory=asynchandler(async(req,res)=>{
+//    const user=await User.aggregate([
+//     {
+//       $match:{
+//         _id:new mongoose.Types.ObjectId(req.user)
+//       }
+//     },
+//     {
+//       $lookup:{
+//         from:"videos",
+//         localfield:"watchHistory",
+//         foreignField:"_id",
+//         as:"watchHistory",
+//         pipeline:[
+//           {
+//             $project:{
+//               fullName:1,
+//               username:1,
+//               avatar:1
+//             }
+//           }
+//         ]
+//       }
+//     },
+//     {
+//       $addFields:{
+//         owner:{
+//           $first:"$owner"
+//         }
+//       }
+//     }
+//    ])
    
-   return res
-   .status(200)
-   .json(
-    new ApiResponse(
-      200,
-      user[0].watchHistory,
-      "Watch History fetched successfully"
-    )
-   )
-})
+//    return res
+//    .status(200)
+//    .json(
+//     new ApiResponse(
+//       200,
+//       user[0].watchHistory,
+//       "Watch History fetched successfully"
+//     )
+//    )
+// })
+const getUserHistory = asynchandler(async (req, res) => {
+  
+    const userId = new mongoose.Types.ObjectId(req.user._id); 
+
+    const userWithHistory = await User.aggregate([
+        {
+            
+            $match: {
+                _id: userId
+            }
+        },
+        {
+            
+            $lookup: {
+                from: "videos",
+                localField: "watchHistory", 
+                foreignField: "_id",
+                as: "watchHistoryVideos",
+              
+                pipeline: [
+                    {
+                        
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "ownerDetails",
+                            pipeline: [
+                                
+                                {
+                                    $project: {
+                                        username: 1,
+                                        fullName: 1,
+                                        avatar: 1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        
+                        $addFields: {
+                            owner: { $first: "$ownerDetails" }
+                        }
+                    },
+                     {
+                        
+                        $project: {
+                            _id: 1,
+                            videoFile: 1,
+                            thumbnail: 1,
+                            title: 1,
+                            description: 1,
+                            duration: 1,
+                            views: 1,
+                            createdAt: 1,
+                            owner: 1 
+                        }
+                    }
+                ]
+            }
+        },
+  
+        {
+             $project:{
+                 _id:0, 
+                 watchHistory: "$watchHistoryVideos" 
+             }
+        }
+    ]);
+
+    
+    if (!userWithHistory || userWithHistory.length === 0) {
+        
+         return res
+            .status(200)
+            .json(new ApiResponse(200, [], "Watch History fetched successfully"));
+    }
+
+    
+    const watchHistory = userWithHistory[0]?.watchHistory || [];
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                watchHistory, 
+                "Watch History fetched successfully"
+            )
+        );
+});
 
 
 
